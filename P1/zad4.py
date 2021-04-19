@@ -1,4 +1,4 @@
-# 2/2 OK
+# 2/2 ZALICZONE
 ''' Obrazki logiczne P1 (uproszczone)
     Wejście: lista zer i jedynek i D długość bloku np. 10000010 5
     Wyjście: minimalna liczba operacji zamiany bitu która da blok jedynek o długości D '''

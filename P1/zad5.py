@@ -4,7 +4,7 @@
 from zad4 import opt_dist
 import numpy as np
 
-def solve(nrows, ncols, rows, cols, max_iter = 600, board = None):
+def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None):
     ''' Zwraca ulozony obrazek w postaci np.array zer i jedynek '''
     if board is not None: 
         board = board
@@ -25,7 +25,7 @@ def solve(nrows, ncols, rows, cols, max_iter = 600, board = None):
     rand_init = 0
 
     while True:
-        print(iter)
+        # print(iter)
         if iter > max_iter: 
             board = np.random.randint(0, 2, (nrows, ncols))
             row_distances = [opt_dist(row,rows[i]) for i,row in enumerate(board)]
@@ -35,7 +35,7 @@ def solve(nrows, ncols, rows, cols, max_iter = 600, board = None):
             iter = 0
             rand_init += 1
 
-        print(bad_cols_ind, bad_rows_ind)
+        # print(bad_cols_ind, bad_rows_ind)
         if len(bad_cols_ind) == 0 and len(bad_rows_ind) == 0: 
             print(f'Obrazek ulozony po {rand_init} losowaniach')
             return board
@@ -79,7 +79,6 @@ def solve(nrows, ncols, rows, cols, max_iter = 600, board = None):
                     if col_distances[best_j] == 0: bad_cols_ind.discard(best_j)
             
             iter += 1
-    
 
 def draw(board, file = None):
     for i in range(len(board)):
