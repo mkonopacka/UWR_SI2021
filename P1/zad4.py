@@ -4,6 +4,9 @@
     Wyjście: minimalna liczba operacji zamiany bitu która da blok jedynek o długości D '''
 
 def opt_dist(seq: list, D: int) -> int:
+    if type(seq) != list: 
+        seq = list(seq)
+    seq += [0]
     min_moves = 1000000000
     start, end = 0, D
     subseq_sum = sum(seq[:end])
@@ -25,7 +28,7 @@ if __name__ == '__main__':
     
     with open('zad4_output.txt', 'w') as f2:
         for input in inputs:
-            sequence = list(map(int, input[:-2])) + [0]
+            sequence = list(map(int, input[:-2]))
             D = int(input[-1])
             result = opt_dist(sequence, D)
             f2.write(str(result) + '\n')
