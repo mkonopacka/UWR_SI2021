@@ -1,5 +1,5 @@
 # AI 2021 P2 : To samo co w zadaniu 4, ale A* 
-# wynik: 20/21 (bez case 13)
+# ZALICZONE
 from utils import *
 from queue import PriorityQueue
 from itertools import combinations

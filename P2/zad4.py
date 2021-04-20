@@ -165,23 +165,28 @@ if __name__ == '__main__':
     double_moves = ["UR", "LD", "UL", "RD", "DR","LU","DL","LU"]
     triple_moves = ["URD", "LDR", "ULD", "RDL", "DRU","LUR","DLU","LUR"]
 
-    initial_set, path1 = reduce_max(initial_set, map, ['U', 'R'])
-    print(len(initial_set))
+    # initial_set, path1 = reduce_max(initial_set, map, ['U'])
+    # print(len(initial_set))
 
-    initial_set, path2 = reduce_random(initial_set, map, ['U', 'R', 'D', 'L'], 50)
+    # initial_set, path2 = reduce_max(initial_set, map, ['R'])
+    # print(len(initial_set))
+    print('____________________________________________________________________________________________________________')
+    path = []
+    for i in range(10000):
+        new_set, path_ = reduce_random(initial_set, map, ['UUUUUUU', 'URURURU', 'RRRRRRR', 'RDRDRDR', 'DDDDDDD', 'DLDLDLD', 'LLLLLLL', 'LULULUL'], 20)
+        if len(new_set) < 3:
+            initial_set = new_set
+            path3 = path_
+            break
     print(len(initial_set))
-
-    initial_set, path3 = reduce_max(initial_set, map, ['R'])
-    print(len(initial_set))
-
-    initial_set, path4 = reduce_random(initial_set, map, ['U', 'R', 'D', 'L'], 40)
-    print(len(initial_set))
-
-    initial_set, path5 = reduce_max(initial_set, map, ['U'])
-    print(len(initial_set))
+    print(initial_set)
 
     path_bfs = BFS2(initial_set, final_set, generate_new_set, ["U", "D", "L", "R"], map = map)
+    final = moves_sequence(initial_set, path_bfs, map)
+    print(final)
+    path = path3 + path_bfs
+    print(len(path))
 
     with open('zad_output.txt', 'w') as f:
-        for char in path1 + path2 + path3 + path4 + path5 + path_bfs:
+        for char in  path:
             f.write(char)

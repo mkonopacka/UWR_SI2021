@@ -1,3 +1,4 @@
+# DO ZROBIENIA
 ''' AI 2021 P2 Sokoban 
     . oznacza puste pole, 
     W ścianę, 
@@ -10,7 +11,6 @@
     Stan końcowy: na wszyskich polach docelowych stoją skrzynki (*)'''
 import numpy as np
 from utils import read_map, get_goals
-from algs import BFS2
 
 moves_dict = {
     "U": (-1,0),
