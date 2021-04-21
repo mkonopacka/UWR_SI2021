@@ -1,4 +1,3 @@
-# AI 2021 P2 : To samo co w zadaniu 4, ale A* 
 # ZALICZONE
 from utils import *
 from queue import PriorityQueue

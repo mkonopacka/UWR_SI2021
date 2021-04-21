@@ -1,4 +1,4 @@
-# przechodzi 6/11
+# 11/11 ZALICZYĆ
 ''' AI 2021 Z4/P2 (Komandos)
 Dane: prostokat n x m z polami "S", "G", "B", "#", " " (mapa)
 Cel: sekwencja ruchow, która na pewno doprowadzila do G
