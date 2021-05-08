@@ -6,20 +6,41 @@ def opt_dist(seq: list, parts: list) -> int:
 
     return 2
 
-def where_ones(parts: list, start: int, end: int) -> List[list]:
-    ''' Zwraca liste list mozliwych indeksow jedynek w ciagu, gdzie `parts` to dlugosci kolejnych, oddzielonych od siebie blokow jedynek 
-        `start`, `end`: numery pierwszego i ostatniego indeksu do wykorzystania
-        `results`: lista indeksow do ktorej bedziemy dopisywac jakies nowe rekurencyjnie '''
-    if end - start + 1 < sum(parts) + len(parts) - 1: 
-        raise ValueError('Sumaryczna dlugosc czesci nie moze przekraczac dlugosci listy z')
+def possible_ones(n: int, parts: list) -> List[list]:
+    ''' Zwraca listę możliwych do ustawienia ciągów długości `n` z długościami bloków podanymi w `parts`'''
+    p = len(parts)
+    if (sum(parts) + p - 1 > n):
+        raise ValueError('Sumaryczna długość bloków z przerwami przekracza długość ciągu')
+    
+    # długość pierwszej części się przyda
+    l = parts[0]
 
-    pass
+    # jeśli został już tylko jeden blok
+    if p == 1:
+        # end = start + l - 1 < n => start < n + 1 - l
+        return [[0]*start + [1]*l + [0]*(n-l-start) for start in range(n + 1 - l)]
+    
+    else:
+        # dla każdego możliwego początku dołączyć wszystkie możliwe końce
+        # obl. max. indeks końca pierwszego ciągu; musi zostać r_min miejsc na resztę ciągu (przed każdym z bloków wolne miejsce)
+        r_min = sum(parts[1:]) + len(parts[1:])
+        max = n - r_min
+        heads = [[0]* x + [1]*l for x in range(0,max - l + 1)]
+        merged = []
+        for head in heads:
+            tails = possible_ones(n - len(head) - 1, parts[1:])
+            # print(f'Tails for head {head}: {tails}')
+            for tail in tails:
+                merged.append(head + [0] + tail)
+        return merged
+
 
 def test_opt_dist(seq, parts, correct):
     result = opt_dist(seq, parts) 
     assert result == correct, f"Should be {correct} instead of {result}"
 
 if __name__ == "__main__":
+    print(possible_ones(100, [2,2,2]))
     tests = [
         ([1,0,1,1,0,1,1,0,0,1], [2,2,2], 2),
         ([1,1,1,1,1,1,1,1,1,1], [5,3], 2),
@@ -31,8 +52,8 @@ if __name__ == "__main__":
     # for seq, parts, correct in tests:
     #     test_opt_dist(seq, parts, correct)
 
-    test = tests[3][0]
-    parts = tests[3][1]
-    print(test)
-    print(parts)
-    where_ones(parts, 0, len(test)-1)
+    # test = tests[3][0]
+    # parts = tests[3][1]
+    # print(test)
+    # print(parts)
+

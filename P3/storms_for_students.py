@@ -1,4 +1,3 @@
-
 def B(i,j):
     return 'B_%d_%d' % (i,j)
     
@@ -8,7 +7,7 @@ def storms(rows, cols, triples):
     R = len(rows)
     C = len(cols)
     
-    bs = [ B(i,j) for i in range(R) for j in range(C)]
+    bs = [B(i,j) for i in range(R) for j in range(C)]
     
     writeln('solve([' + ', '.join(bs) + ']) :- ')
     
@@ -26,8 +25,8 @@ def writeln(s):
 txt = open('zad_input.txt').readlines()
 output = open('zad_output.txt', 'w')
 
-rows = map(int, txt[0].split())
-cols = map(int, txt[1].split())
+rows = list(map(int, txt[0].split()))
+cols = list(map(int, txt[1].split()))
 triples = []
 
 for i in range(2, len(txt)):

@@ -1,4 +1,4 @@
-# DZIAŁA, ZALICZYĆ CZY COŚ
+# ZALICZONE
 ''' Obrazki logiczne c.d. 
     Input: #kolumn #wierszy \n kol1 \n kol2 ... \n wiersz1 ...
     Oznaczenia: # - pełne . -puste (pole) '''
