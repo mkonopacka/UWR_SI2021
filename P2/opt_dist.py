@@ -1,13 +1,10 @@
 from typing import * 
+from functools import lru_cache
 
-def opt_dist(seq: list, parts: list) -> int:
-    ''' Dla listy zer i jedynek i listy dlugosci kolejnych blokow zwraca minimalna liczbe operacji zamiany bitu 
-        Pomysł: sprawdzić wszystkie możliwe podziały na bloki i porównać ich sumaryczne wyniki '''
-
-    return 2
-
-def possible_ones(n: int, parts: list) -> List[list]:
+@lru_cache(maxsize = None)
+def possible_ones(n: int, parts: tuple) -> List[list]:
     ''' Zwraca listę możliwych do ustawienia ciągów długości `n` z długościami bloków podanymi w `parts`'''
+
     p = len(parts)
     if (sum(parts) + p - 1 > n):
         raise ValueError('Sumaryczna długość bloków z przerwami przekracza długość ciągu')
@@ -34,26 +31,32 @@ def possible_ones(n: int, parts: list) -> List[list]:
                 merged.append(head + [0] + tail)
         return merged
 
-
-def test_opt_dist(seq, parts, correct):
-    result = opt_dist(seq, parts) 
+def test_opt_dist_multi(seq, parts, correct):
+    result = opt_dist_multi(seq, parts) 
     assert result == correct, f"Should be {correct} instead of {result}"
 
+def opt_dist_multi(seq: list, Ds: List[int]) -> int:
+    ''' Zwraca minimalną liczbę operacji zamiany bitu, które należy wykonać, żeby zamienić ciąg zer i jedynek seq tak, aby
+        jedynki tworzyły oddzielne bloki o długościach podanych kolejno w Ds'''
+    
+    min_moves = 1000000000
+    # spr. na ilu bitach różni się seq z każdym z możliwych ustawień
+    for ones in possible_ones(len(seq), tuple(Ds)):
+        diff_sum = sum([ones[i] != seq[i] for i in range(len(seq))])
+        min_moves = min(min_moves,diff_sum)
+    
+    return min_moves
+
 if __name__ == "__main__":
-    print(possible_ones(100, [2,2,2]))
     tests = [
         ([1,0,1,1,0,1,1,0,0,1], [2,2,2], 2),
         ([1,1,1,1,1,1,1,1,1,1], [5,3], 2),
         ([0,1,0,1,1,0,0,1,1,0], [3,4], 4),
         ([0,0,1,0,1,1,0,1,0,1], [4,2], 3),
-        ([0,0,0,0,0,0,0,0,0,0], [1,1,1], 3)
+        ([0,0,0,0,0,0,0,0,0,0], [1,1,1], 3),
+        ([1,1,0,1,0,0,0,1,1,0,1,0,1,1], [1,2,3,5], 7)
     ]
 
-    # for seq, parts, correct in tests:
-    #     test_opt_dist(seq, parts, correct)
-
-    # test = tests[3][0]
-    # parts = tests[3][1]
-    # print(test)
-    # print(parts)
+    for seq, parts, correct in tests:
+        test_opt_dist_multi(seq, parts, correct)
 
