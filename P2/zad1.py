@@ -1,4 +1,4 @@
-# wynik: 
+# wynik: 8/12
 # TODO zoptymalizować + wybrać lepsze p, iter jeśli się da
 # np. zmienić listy na stringi, zmienić pętle na list comprehension(?), uzależnić losowanie na nowo od tego jak daleko się jest
 ''' Obrazki logiczne pełna wersja (por. zad 5/P1)
