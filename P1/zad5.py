@@ -15,7 +15,7 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.5):
     
     h,w = board.shape
 
-    # listy opt_dist dla wierszy i kolumn, żeby nie musiały się mnóstwo razy liczyć
+    # listy opt_dist dla wierszy i kolumn
     row_distances = [opt_dist(row,rows[i]) for i,row in enumerate(board)]
     col_distances = [opt_dist(col,cols[i]) for i,col in enumerate(board.T)]
 
@@ -27,7 +27,6 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.5):
     rand_init = 0
 
     while True:
-        # print(iter)
         if iter > max_iter: 
             board = np.random.randint(0, 2, (nrows, ncols))
             row_distances = [opt_dist(row,rows[i]) for i,row in enumerate(board)]
@@ -36,23 +35,16 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.5):
             bad_cols_ind = set([i for i in range(ncols) if col_distances[i] > 0])
             iter = 0
             rand_init += 1
-        
-        # listy opt_dist dla wierszy i kolumn, żeby nie musiały się mnóstwo razy liczyć
-        row_distances = [opt_dist(row,rows[i]) for i,row in enumerate(board)]
-        col_distances = [opt_dist(col,cols[i]) for i,col in enumerate(board.T)]
-
-        # indeksy nieułożonych wierszy i kolumn
-        bad_rows_ind = set([j for j in range(nrows) if row_distances[j] > 0])
-        bad_cols_ind = set([i for i in range(ncols) if col_distances[i] > 0])
-
-        # print(bad_cols_ind, bad_rows_ind)
+            
         if len(bad_cols_ind) == 0 and len(bad_rows_ind) == 0: 
             print(f'Obrazek ulozony po {rand_init} losowaniach w {iter} iteracji')
             return board
         else:
+            # patrz: coś ok. linii 86
+            triple = None
+            
             # wybor złej kolumny
             if np.random.randint(0,2) == 0 and len(bad_cols_ind) != 0:
-                # print(f'bad_cols: {bad_cols_ind}')
                 j = np.random.choice(tuple(bad_cols_ind))
                 d_lst = []
                 for i in range(h):
@@ -65,14 +57,6 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.5):
                 else:
                     randind = np.random.randint(1,len(d_lst))
                     triple = d_lst[randind]
-                _,i,j = triple
-                board[i, j] ^=1
-                row_distances[i] = opt_dist(board[i,:],rows[i])
-                col_distances[j] = opt_dist(board[:,j], cols[j])
-                # if row_distances[i] == 0: bad_rows_ind.discard(i)
-                # if col_distances[j] == 0: bad_cols_ind.discard(j)
-                # if row_distances[i] > 0: bad_rows_ind.add(i)
-                # if row_distances[j] > 0: bad_rows_ind.add(j)
 
             # wybor złego wiersza
             if np.random.randint(0,2) == 1 and len(bad_rows_ind) != 0:
@@ -89,14 +73,17 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.5):
                 else:
                     randind = np.random.randint(1,len(d_lst))
                     triple = d_lst[randind]
+                
+            # jeśli udało się znaleźć jakiś piksel, podmiana
+            if triple is not None:
                 _,i,j = triple
                 board[i, j] ^=1
                 row_distances[i] = opt_dist(board[i,:],rows[i])
                 col_distances[j] = opt_dist(board[:,j], cols[j])
-                # if row_distances[i] == 0: bad_rows_ind.discard(i)
-                # if col_distances[j] == 0: bad_cols_ind.discard(j)
-                # if row_distances[i] > 0: bad_rows_ind.add(i)
-                # if row_distances[j] > 0: bad_rows_ind.add(j)
+                if row_distances[i] == 0: bad_rows_ind.discard(i)
+                if col_distances[j] == 0: bad_cols_ind.discard(j)
+                if row_distances[i] > 0: bad_rows_ind.add(i)
+                if col_distances[j] > 0: bad_cols_ind.add(j)
             
             iter += 1
 
