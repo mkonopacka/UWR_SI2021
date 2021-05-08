@@ -1,3 +1,6 @@
+# wynik: 
+# TODO zoptymalizować + wybrać lepsze p, iter jeśli się da
+# np. zmienić listy na stringi, zmienić pętle na list comprehension(?), uzależnić losowanie na nowo od tego jak daleko się jest
 ''' Obrazki logiczne pełna wersja (por. zad 5/P1)
     Input: nrows ncols \n [row1] \n [row2] ... [col1] \n [col2] ... '''
 import numpy as np
@@ -16,8 +19,9 @@ def try_change_bit(i,j, rows, cols, board, row_distances, col_distances):
     d = col_dist2 - col_dist1 + row_dist2 - row_dist1
     return d
 
-def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.2):
+def solve(nrows, ncols, rows, cols, max_iter = None, board = None, p = 0.1):
     ''' Zwraca ulozony obrazek w postaci np.array zer i jedynek '''
+    max_iter = max_iter if max_iter else ncols * nrows * 10
     if board is not None: 
         board = board
     else: 
@@ -36,7 +40,7 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.2):
     iter = 0
     rand_init = 0
 
-    while True:
+    while 1:
         if iter > max_iter: 
             board = np.random.randint(0, 2, (nrows, ncols))
             row_distances = [opt_dist_multi(row,rows[i]) for i,row in enumerate(board)]
@@ -47,7 +51,7 @@ def solve(nrows, ncols, rows, cols, max_iter = 1000, board = None, p = 0.2):
             rand_init += 1
             
         if len(bad_cols_ind) == 0 and len(bad_rows_ind) == 0: 
-            print(f'Obrazek ulozony po {rand_init} losowaniach w {iter} iteracji')
+            print(f'Obrazek {nrows} x {ncols} ulozony po {rand_init} losowaniach w {iter} iteracji')
             return board
         else:
             # patrz: coś ok. linii 86
@@ -112,7 +116,7 @@ if __name__ == '__main__':
         nrows,ncols = map(int, (lines[0]).split())
         rows = [list(map(int, seq.split())) for seq in lines[1: 1+nrows]]
         cols = [list(map(int, seq.split())) for seq in lines[1+nrows: ]]
-        solved = solve(nrows, ncols, rows, cols)
+        solved = solve(nrows, ncols, rows, cols, max_iter= 1000)
         draw(solved)
         with open('zad_output.txt', 'w') as f2:
             draw(solved, file = f2)

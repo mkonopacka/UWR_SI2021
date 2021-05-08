@@ -47,3 +47,18 @@ def around(pos: tuple, moves = [(0,1), (0,-1), (1,0), (-1,0)]):
 def dist(p1: tuple, p2: tuple) -> int:
     ''' Zwraca odleglosc manhatanska pomiedzy punktami p1 i p2'''
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+def read_nonogram(in_file, out_file):
+    ''' Wczytuje obrazek logiczny w postaci # i . z pliku i wypisuje do innego pliku wejście w formacie z zadań
+        tzn. nrow \n ncol \n [row1] \n [row2] \n ... [coln] '''
+    with open(in_file) as in_file:
+        lines = in_file.read().splitlines()
+        print(lines)
+        nrows = len(lines)
+        ncols = len(lines[0])
+        print(nrows,ncols)
+        # TODO
+
+if __name__ == '__main__':
+    # TODO test read_nonogram
+    read_nonogram('nonogram.txt', 1)
