@@ -1,3 +1,4 @@
+# TODO: naprawić (psuje się)
 # Moduł do obrazków logicznych
 from os import error
 from typing import *
@@ -68,36 +69,37 @@ def nonogram_inference(nrow, ncol, rows: List[int], cols: List[int], max_iter = 
     - powtarzamy, aż nie pozostanie nic do sprawdzenia
     ---------------------------------------------------------------------------
     '''
+    # TODO zamienić listy wewnątrz arrangements na tuple i zrobić z nich seta, żeby szybciej wyjmować elementy
     lengths = {"rows": ncol, "cols": nrow}
     examine = {"rows": [True] * nrow, "cols": [True] * ncol}
-    
-    # TODO zamienić listy wewnątrz na tuple i zrobić z nich seta, żeby szybciej wyjmować elementy
     arrangements = {"rows": [possible_ones(ncol, row) for row in rows], "cols": [possible_ones(nrow, col) for col in cols]}
     board = np.full(shape = (nrow,ncol), fill_value = 2, dtype = np.uint8)
 
     for iter in range(max_iter):
-        print(f'Iteracja {iter} ---------------------------------')
+        print(f'Iteracja {iter} ---------------------------------------------------------------------------------------------------------------------------------')
         print(f'examine[\'rows\']: {examine["rows"]}')
         print(f'examine[\'cols\']: {examine["cols"]}')
+        
         if sum(examine["rows"]) == 0 and sum(examine["cols"]) == 0: 
             print('Nie zostalo nic do sprawdzenia')
             return board
         
-        # Losowanie
+        # LOSOWANIE WIERSZA/KOLUMNY
         while True:
             what, ind = choose_one(nrow, ncol) # np. ("rows", 5)
             if examine[what][ind]: break # jeśli jest do sprawdzenia, nie trzeba dalej losować
             if len(arrangements[what][ind]) == 0:
                 raise ValueError('Coś nie tak: puste arranements dla {what} {ind}') # debug
         
+        # SPRAWDZANIE MOŻLIWYCH USTAWIEŃ 
+        # Jeśli któreś z nich nie ma jedynki, zmieniamy all_ones na tym miejscu na False; analogicznie z zerami
         all_ones = [True] * lengths[what]
         all_zeros = [True] * lengths[what]
-        # Iteracja po wszystkich ustawieniach: jeśli któreś z nich nie ma jedynki, zmieniamy all_ones na False
-        # (analogicznie dla zera); np. arrangements['rows'][0] lista wszystkich możliwych ustawień pierwszego wiersza
+        
         for i in range(len(all_ones)):
             ones_broken = zeros_broken = False
             for arr in arrangements[what][ind]:
-                if arr[i] == 0: 
+                if arr[i] != 1: 
                     all_ones[i] = False 
                     ones_broken = True
                 else: 
@@ -106,47 +108,66 @@ def nonogram_inference(nrow, ncol, rows: List[int], cols: List[int], max_iter = 
                 if zeros_broken and ones_broken: 
                     break # jeśli znaleźliśmy już że na jakimś miejscu nie ma wszędzie ani zer ani jedynek, nie ma sensu dalej sprawdzać
         
-        # Wiemy już, gdzie są same zera i same jedynki, więc możemy ustawić te pola
+        # USTAWIANIE PEWNYCH PÓL + USUWANIE WYKRYTYCH NIEMOŻLIWYCH USTAWIEŃ
         for x in range(len(all_ones)):
             if all_ones[x] and all_zeros[x]:
-                raise ValueError(f"Coś nie tak: all_zeros: {all_zeros}, all_ones: {all_ones}") # debug
+                raise ValueError(f"Coś nie tak: all_zeros: {all_zeros}, all_ones: {all_ones}")
 
-            # indeks w arrayu zal. czy to wiersz czy kolumna TODO zoptymalizować później
+            # Indeks do zmiany pola board
             i,j = (ind, x) if what == 'rows' else (x, ind)
 
             if all_ones[x]:
                 board[i,j] = 1
-                # po zmianie pola na planszy, trzeba jeszcze usunąć wszystkie ustawienia, które mają w tym miejscu 0
-                # z zarówno wierszy jak i kolumn. Po usunięciu jakiegoś ustawienia trzeba oznaczyć ten wiersz/kolumnę jako do sprawdzenia
-                for arr in arrangements["rows"][i]:
-                    # spr. miejsce j w wierszu i
+                # Listy indeksów ustawień, które należy usunąć ze względu na niedopasowanie na miejscu x
+                remove_row_arr = []
+                remove_col_arr = []
+                # Sprawdzenie miejsca j w wierszu i
+                for arr_index, arr in enumerate(arrangements["rows"][i]):
                     if arr[j] != 1:
-                        arrangements["rows"][i].remove(arr)
-                        examine["rows"][i] = True # TODO zoptymalizować, bo teraz to się robi wielokrotnie
+                        remove_row_arr.append(arr_index)
+                        examine["rows"][j] = True
                 
-                for arr in arrangements["cols"][j]:
-                    # spr. miejsce i w kolumnie j
+                # Sprawdzanie miejsca i w kolumnie j
+                for arr_index, arr in enumerate(arrangements["cols"][j]):
                     if arr[i] != 1:
-                        arrangements["cols"][j].remove(arr)
+                        remove_col_arr.append(arr_index)
                         examine["cols"][j] = True
-
+                
+                # Usuwanie ustawień z wiersza i 
+                for arr_ind in sorted(remove_row_arr, reverse = True): 
+                    del arrangements["rows"][i][arr_ind]
+                
+                # Usuwanie ustawień z kolumny j
+                for arr_ind in sorted(remove_col_arr, reverse = True): 
+                    del arrangements["cols"][j][arr_ind]
+                
             if all_zeros[x]:
                 board[i,j] = 0
-                for arr in arrangements["rows"][i]:
-                    # spr. miejsce j w wierszu i
+                # Listy indeksów ustawień, które należy usunąć ze względu na niedopasowanie na miejscu x
+                remove_row_arr = []
+                remove_col_arr = []
+                # Sprawdzenie miejsca j w wierszu i
+                for arr_index, arr in enumerate(arrangements["rows"][i]):
                     if arr[j] != 0:
-                        arrangements["rows"][i].remove(arr)
-                        examine["rows"][i] = True # TODO zoptymalizować, bo teraz to się robi wielokrotnie
+                        remove_row_arr.append(arr_index)
+                        examine["rows"][j] = True
                 
-                for arr in arrangements["cols"][j]:
-                    # spr. miejsce i w kolumnie j
+                # Sprawdzanie miejsca i w kolumnie j
+                for arr_index, arr in enumerate(arrangements["cols"][j]):
                     if arr[i] != 0:
-                        arrangements["cols"][j].remove(arr)
+                        remove_col_arr.append(arr_index)
                         examine["cols"][j] = True
+                
+                # Usuwanie ustawień z wiersza i 
+                for arr_ind in sorted(remove_row_arr, reverse = True): 
+                    del arrangements["rows"][i][arr_ind]
+                
+                # Usuwanie ustawień z kolumny j
+                for arr_ind in sorted(remove_col_arr, reverse = True): 
+                    del arrangements["cols"][j][arr_ind]
             
-            # można ustawić teraz ten wiersz / kolumnę jako sprawdzony
-            # TODO przy losowaniu dodać sprawdzanie czy nie jest to sprawdzone
-            examine[what][ind] = False
+        # Można ustawić teraz ten wiersz / kolumnę jako sprawdzony
+        examine[what][ind] = False
     
     return board
 
